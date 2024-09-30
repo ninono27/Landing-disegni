@@ -80,6 +80,14 @@ app.get("*", (req, res) => {
   res.status(404).send("Not Found");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+function startServer(port) {
+  return app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
+
+module.exports = { app, startServer };
+
+if (require.main === module) {
+  startServer(PORT);
+}
