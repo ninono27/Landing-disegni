@@ -30,10 +30,21 @@ describe('Server', () => {
 
     it('should return 200 if image data is provided', async () => {
       const image = `data:image/png;base64,${fs.readFileSync(path.join(__dirname, 'test.png'), 'base64')}`;
-      const response = await request(server).post('/upload').send({ image });
+      const response = await request(app).post('/upload').send({ image });
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.url).toBeDefined();
+
+      // Check if the file was created
+      const uploadedFilePath = path.join(__dirname, '..', response.body.url);
+      expect(fs.existsSync(uploadedFilePath)).toBe(true);
+
+      // Delete the uploaded file
+      fs.unlinkSync(uploadedFilePath);
+
+      // Verify the file was deleted
+      expect(fs.existsSync(uploadedFilePath)).toBe(false);
     });
   });
 
