@@ -1,22 +1,41 @@
-# Use the official Node.js 18 image as a parent image
-FROM node:18
+# Build stage
+# Use Alpine-based Node.js image for a smaller footprint
+FROM node:18-alpine AS build
 
-# Set the working directory in the container to /app
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
+# Install only production dependencies
+RUN npm install --only=production
 
-# Install the application dependencies
-RUN npm install
+# Production stage
+# Start a new stage from a minimal Alpine-based Node.js image
+FROM node:18-alpine
 
-# Copy the rest of the application code to the container
+# Add Tini for proper init process
+# - Tini reaps zombie processes.
+# - Signals are properly forwarded to the main process.
+RUN apk add --no-cache tini
+# Set Tini as the entry point
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# Set the working directory for the production image
+WORKDIR /app
+
+# Create a non-root user for security
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Copy node_modules from build stage
+COPY --from=build /app/node_modules ./node_modules
+# Copy application files
 COPY . .
 
-# Expose the port that your application listens on
+# Switch to non-root user
+USER nodejs
+
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Define the command to run your application
-CMD ["npm", "start"]
-
-
+# Command to run the application
+CMD ["node", "server.js"]

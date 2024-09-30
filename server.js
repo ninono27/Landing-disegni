@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors");
+
 const bodyParser = require("body-parser");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
@@ -7,7 +7,8 @@ const path = require("path");
 require("dotenv").config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "uploads");
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -40,7 +41,7 @@ app.post("/upload", (req, res) => {
     const extension = mimeType.split("/")[1];
 
     const filename = `${uuidv4()}.${extension}`;
-    const filePath = path.join(__dirname, "uploads", filename);
+    const filePath = path.join(UPLOAD_DIR, filename);
 
     fs.mkdir(path.join(__dirname, "uploads"), { recursive: true }, (err) => {
       if (err) {
@@ -72,7 +73,7 @@ app.post("/upload", (req, res) => {
   }
 });
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 // Catch-all route for any other requests
 app.get("*", (req, res) => {

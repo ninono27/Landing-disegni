@@ -1,10 +1,25 @@
 {
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "rules": {
+    "no-console": "off"
+  },
   "name": "landing-disegni",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^9.11.1"
   },
   "repository": {
     "type": "git",

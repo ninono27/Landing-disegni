@@ -117,7 +117,7 @@ document.getElementById("upload").addEventListener("click", () => {
         body: JSON.stringify({ image: imageData }),
     })
         .then((response) => response.json())
-        .then((data) => {
+        .then(() => {
             alert("Disegno caricato con successo!");
         })
         .catch((error) => {
